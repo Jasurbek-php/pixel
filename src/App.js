@@ -3,11 +3,18 @@ import React, { useState } from 'react';
 function ToDoApp() {
   const [tasks, setTasks] = useState([]); // Vazifalar ro'yxati
   const [task, setTask] = useState('');   // Yangi vazifa uchun input qiymati
+  const [deadline, setDeadline] = useState(''); // Vazifa tugash vaqti uchun input qiymati
 
   const addTask = () => {
-    if (task.trim()) {
-      setTasks([...tasks, task]); // Yangi vazifani ro'yxatga qo'shish
+    if (task.trim() && deadline.trim()) {
+      const currentTime = new Date(); // Hozirgi vaqtni olish
+      const timeString = currentTime.toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit',
+      }); // Soat va minutni formatlash
+      setTasks([...tasks, { text: task, timeAdded: timeString, deadline }]); // Vazifani vaqtlar bilan birga qo'shish
       setTask(''); // Inputni tozalash
+      setDeadline(''); // Tugash vaqtini tozalash
     }
   };
 
@@ -18,7 +25,7 @@ function ToDoApp() {
 
   return (
     <div style={{ maxWidth: '400px', margin: '50px auto', textAlign: 'center' }}>
-      <h1>Pixel vazifalari</h1>
+      <h1>To-Do List</h1>
       <div>
         <input
           type="text"
@@ -32,16 +39,24 @@ function ToDoApp() {
             marginBottom: '10px',
           }}
         />
+        <input
+          type="time"
+          value={deadline}
+          onChange={(e) => setDeadline(e.target.value)}
+          style={{
+            padding: '10px',
+            fontSize: '16px',
+            marginLeft: '10px',
+            marginBottom: '10px',
+          }}
+        />
         <button
           onClick={addTask}
           style={{
             padding: '10px 20px',
             fontSize: '16px',
             marginLeft: '10px',
-            border: '1px solid',
-            borderRadius: '15px',
             cursor: 'pointer',
-
           }}
         >
           Qo'shish
@@ -52,7 +67,6 @@ function ToDoApp() {
           <li
             key={index}
             style={{
-              transition: '1s',
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
@@ -63,7 +77,11 @@ function ToDoApp() {
               borderRadius: '5px',
             }}
           >
-            <span>{task}</span>
+            <span>
+              <strong>{task.text}</strong> <br />
+              <small style={{ color: '#555' }}>Qo'shildi: {task.timeAdded}</small> <br />
+              <small style={{ color: '#555' }}>Tayyor bo'lishi kerak: {task.deadline}</small>
+            </span>
             <button
               onClick={() => deleteTask(index)}
               style={{
@@ -74,7 +92,6 @@ function ToDoApp() {
                 border: 'none',
                 borderRadius: '3px',
                 cursor: 'pointer',
-                transition: '1s',
               }}
             >
               O'chirish
